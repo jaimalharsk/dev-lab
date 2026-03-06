@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+data/*.db
+data/resume_job_*.txt
+data/cover_job_*.txt
