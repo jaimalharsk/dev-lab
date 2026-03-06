@@ -1,13 +1,11 @@
 from datetime import date
 from pathlib import Path
-from typing import Callable
 
 from config import (
     CANDIDATE_PROFILE_PATH,
     MASTER_RESUME_PATH,
     MIN_RELEVANCE_SCORE,
     MAX_APPLICATIONS_PER_DAY,
-    OPENAI_API_KEY,
 )
 from db import init_db, get_session, Job, Application
 from scrapers.remoteok import fetch_remoteok_jobs
@@ -24,21 +22,13 @@ def load_text(path: Path, fallback: str) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else fallback
 
 
-def _safe_fetch(fetcher: Callable[..., list], *args) -> list:
-    try:
-        return fetcher(*args)
-    except Exception as exc:  # noqa: BLE001
-        print(f"[WARN] Source failed: {fetcher.__name__}: {exc}")
-        return []
-
-
 def upsert_jobs() -> None:
     session = get_session()
     all_jobs = (
-        _safe_fetch(fetch_remoteok_jobs, 10)
-        + _safe_fetch(fetch_weworkremotely_jobs, 10)
-        + _safe_fetch(fetch_linkedin_jobs, 10)
-        + _safe_fetch(fetch_company_careers_jobs, ["https://boards.greenhouse.io"], 3)
+        fetch_remoteok_jobs(10)
+        + fetch_weworkremotely_jobs(10)
+        + fetch_linkedin_jobs(10)
+        + fetch_company_careers_jobs(["https://boards.greenhouse.io"], 3)
     )
 
     for j in all_jobs:
@@ -57,14 +47,9 @@ def upsert_jobs() -> None:
         )
     session.commit()
     session.close()
-    print(f"[INFO] Stored/updated jobs from sources: {len(all_jobs)} candidates collected.")
 
 
 def apply_pipeline(dry_run: bool = True) -> None:
-    if not OPENAI_API_KEY:
-        print("[WARN] OPENAI_API_KEY is missing. Skipping AI scoring + auto-apply stage.")
-        return
-
     profile = load_text(CANDIDATE_PROFILE_PATH, "Python backend engineer with cloud/devops experience")
     master_resume = load_text(MASTER_RESUME_PATH, "Master resume placeholder")
 
