@@ -6,21 +6,30 @@ A **minimal but functional local automation system** to discover remote jobs, fi
 
 ## 1) System architecture diagram
 
+
+So visually:
+
 ```mermaid
 flowchart TD
-    A[Job Sources\nLinkedIn guest jobs\nRemoteOK API\nWeWorkRemotely\nCompany career pages] --> B[Scraper Layer]
-    B --> C[(SQLite DB: jobs)]
-    C --> D[AI Relevance Scorer\n1-10 score]
-    D --> E{Score >= threshold?}
-    E -- No --> C
-    E -- Yes --> F[Resume Tailoring Module]
-    E -- Yes --> G[Cover Letter Generator]
-    F --> H[(Generated resume files)]
-    G --> I[(Generated cover letters)]
-    H --> J[Playwright Application Bot\n(dry-run by default)]
+    A[Job Sources] --> B[Scraper Layer]
+    B --> C[(Jobs DB)]
+
+    C --> D[AI Relevance Scorer]
+    D --> E{Score >= Threshold}
+
+    E -->|No| C
+    E -->|Yes| F[Resume Tailor]
+    E -->|Yes| G[Cover Letter Generator]
+
+    F --> H[(Resume Files)]
+    G --> I[(Cover Letters)]
+
+    H --> J[Application Bot]
     I --> J
-    J --> K[(SQLite DB: applications)]
-    K --> L[Streamlit Dashboard]
+
+    J --> K[(Applications DB)]
+
+    K --> L[Dashboard]
 ```
 
 ## 2) Folder structure
