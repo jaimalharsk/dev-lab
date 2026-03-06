@@ -76,7 +76,7 @@ remote-job-autoapply-mvp/
 ### Step 1 — Setup
 
 ```bash
-cd experiments/remote-job-autoapply-mvp
+cd experiments/local-ai/remote-job-autoapply-mvp
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
