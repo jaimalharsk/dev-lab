@@ -66,8 +66,8 @@ def apply_pipeline(dry_run: bool = True) -> None:
     )
 
     for job in jobs:
-        score = score_job_relevance(profile, job.description)
-        job.relevance_score = score
+        result = score_job_relevance(profile, job.description)
+        job.relevance_score = result.score
     session.commit()
 
     targets = (

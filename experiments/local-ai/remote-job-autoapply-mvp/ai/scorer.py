@@ -1,23 +1,25 @@
 from config import OPENAI_MODEL
 from ai.client import get_client
+from ai.schemas import JobRelevanceResult
 
 
-def score_job_relevance(candidate_profile: str, job_description: str) -> int:
+def score_job_relevance(candidate_profile: str, job_description: str) -> JobRelevanceResult:
     client = get_client()
-    prompt = f"""
-You are a strict recruiter assistant.
-Score job relevance from 1-10 based on candidate profile fit.
-Return only an integer.
-
-Candidate profile:
-{candidate_profile}
-
-Job description:
-{job_description}
-"""
-    response = client.responses.create(model=OPENAI_MODEL, input=prompt)
-    text = response.output_text.strip()
-    try:
-        return max(1, min(10, int(''.join(ch for ch in text if ch.isdigit())[:2] or "1")))
-    except ValueError:
-        return 1
+    response = client.beta.chat.completions.parse(
+        model=OPENAI_MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a strict recruiter assistant. Evaluate job fit and return structured data.",
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Candidate profile:\n{candidate_profile}\n\n"
+                    f"Job description:\n{job_description}"
+                ),
+            },
+        ],
+        response_format=JobRelevanceResult,
+    )
+    return response.choices[0].message.parsed
