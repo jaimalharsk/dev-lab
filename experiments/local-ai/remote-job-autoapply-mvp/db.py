@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import create_engine, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, Session
 from config import DATABASE_URL
@@ -31,6 +31,7 @@ class Application(Base):
     status: Mapped[str] = mapped_column(String(50), default="applied")
     tailored_resume_path: Mapped[str | None] = mapped_column(String(400), nullable=True)
     cover_letter_path: Mapped[str | None] = mapped_column(String(400), nullable=True)
+    follow_up_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
 def init_db() -> None:

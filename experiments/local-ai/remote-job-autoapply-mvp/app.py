@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from config import (
@@ -12,10 +12,13 @@ from scrapers.remoteok import fetch_remoteok_jobs
 from scrapers.weworkremotely import fetch_weworkremotely_jobs
 from scrapers.linkedin import fetch_linkedin_jobs
 from scrapers.company_pages import fetch_company_careers_jobs
+from scrapers.liveness import check_liveness
 from ai.scorer import score_job_relevance
 from ai.resume_tailor import tailor_resume
 from ai.cover_letter import generate_cover_letter
 from automator.apply_playwright import submit_application
+
+FOLLOW_UP_DAYS = 7
 
 
 def load_text(path: Path, fallback: str) -> str:
@@ -57,7 +60,7 @@ def apply_pipeline(dry_run: bool = True) -> None:
     applied_today = session.query(Application).filter(Application.date_applied >= date.today()).count()
     remaining = max(0, MAX_APPLICATIONS_PER_DAY - applied_today)
 
-    jobs = (
+    unscored_jobs = (
         session.query(Job)
         .filter(Job.relevance_score.is_(None))
         .order_by(Job.date_found.desc())
@@ -65,9 +68,21 @@ def apply_pipeline(dry_run: bool = True) -> None:
         .all()
     )
 
-    for job in jobs:
+    for job in unscored_jobs:
+        liveness = check_liveness(job.application_link)
+        if liveness.status == "expired":
+            print(f"  [skip] {job.company} — {job.title}: posting expired ({liveness.reason})")
+            session.delete(job)
+            session.commit()
+            continue
+
         result = score_job_relevance(profile, job.description)
         job.relevance_score = result.score
+        print(
+            f"  [score] {job.company} — {job.title}: {result.score}/10 "
+            f"(match={result.role_match:.2f} level={result.level_fit:.2f} "
+            f"growth={result.growth_potential:.2f} remote={result.remote_alignment:.2f})"
+        )
     session.commit()
 
     targets = (
@@ -102,6 +117,7 @@ def apply_pipeline(dry_run: bool = True) -> None:
                 status="applied",
                 tailored_resume_path=str(resume_path),
                 cover_letter_path=str(cover_path),
+                follow_up_date=datetime.utcnow() + timedelta(days=FOLLOW_UP_DAYS),
             )
         )
         session.commit()
@@ -109,8 +125,25 @@ def apply_pipeline(dry_run: bool = True) -> None:
     session.close()
 
 
+def print_pending_follow_ups() -> None:
+    session = get_session()
+    due = (
+        session.query(Application, Job)
+        .join(Job, Application.job_id == Job.id)
+        .filter(Application.follow_up_date <= datetime.utcnow())
+        .filter(Application.status == "applied")
+        .all()
+    )
+    if due:
+        print("\nFollow-ups due:")
+        for app, job in due:
+            print(f"  {job.company} — {job.title} (applied {app.date_applied.date()}, follow up by {app.follow_up_date.date()})")
+    session.close()
+
+
 if __name__ == "__main__":
     init_db()
     upsert_jobs()
     apply_pipeline(dry_run=True)
-    print("Pipeline completed. Set dry_run=False after validating selectors and platform compliance.")
+    print_pending_follow_ups()
+    print("\nPipeline completed. Set dry_run=False after validating selectors and platform compliance.")

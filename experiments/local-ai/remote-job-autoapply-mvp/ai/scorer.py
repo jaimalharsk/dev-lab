@@ -10,7 +10,15 @@ def score_job_relevance(candidate_profile: str, job_description: str) -> JobRele
         messages=[
             {
                 "role": "system",
-                "content": "You are a strict recruiter assistant. Evaluate job fit and return structured data.",
+                "content": (
+                    "You are a strict recruiter assistant. Score the job fit across four dimensions "
+                    "(each 0.0–1.0): "
+                    "role_match (skills/experience overlap), "
+                    "level_fit (seniority alignment), "
+                    "growth_potential (career growth opportunity), "
+                    "remote_alignment (work arrangement preference). "
+                    "A composite score is computed as weighted average — be calibrated, not generous."
+                ),
             },
             {
                 "role": "user",

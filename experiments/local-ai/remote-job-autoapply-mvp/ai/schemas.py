@@ -1,12 +1,31 @@
 from typing import Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 
 class JobRelevanceResult(BaseModel):
-    score: int = Field(..., ge=1, le=10)
+    role_match: float = Field(..., ge=0.0, le=1.0)
+    level_fit: float = Field(..., ge=0.0, le=1.0)
+    growth_potential: float = Field(..., ge=0.0, le=1.0)
+    remote_alignment: float = Field(..., ge=0.0, le=1.0)
     fit_level: Literal["low", "medium", "high"]
     reasons: list[str] = Field(..., min_length=1)
     recommended_keywords: list[str]
+
+    @computed_field
+    @property
+    def score(self) -> int:
+        composite = (
+            self.role_match * 0.45
+            + self.level_fit * 0.30
+            + self.growth_potential * 0.15
+            + self.remote_alignment * 0.10
+        )
+        return round(composite * 10)
+
+
+class LivenessResult(BaseModel):
+    status: Literal["active", "expired", "uncertain"]
+    reason: str
 
 
 class CoverLetter(BaseModel):
