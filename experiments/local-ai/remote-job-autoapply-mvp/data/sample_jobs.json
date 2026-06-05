@@ -1,0 +1,99 @@
+[
+  {
+    "id": 1,
+    "source": "remoteok",
+    "company": "Stripe",
+    "title": "Senior Backend Engineer — Payments Infrastructure",
+    "location": "Remote (US/EU)",
+    "application_link": "https://stripe.com/jobs/listing/senior-backend-engineer/12345",
+    "raw_description": "We're looking for a Senior Backend Engineer to join our Payments Infrastructure team. You'll design and build distributed systems that process billions of transactions. 5+ years Python or Go required. Experience with Kafka, gRPC, and PostgreSQL strongly preferred. You'll own reliability, latency, and on-call rotations for critical payment paths.",
+    "liveness_check": {
+      "status": "active",
+      "reason": "apply control detected"
+    },
+    "ai_scoring": {
+      "role_match": 0.88,
+      "level_fit": 0.82,
+      "growth_potential": 0.75,
+      "remote_alignment": 0.95,
+      "fit_level": "high",
+      "score": 8,
+      "reasons": [
+        "Strong Python/Go overlap with candidate profile",
+        "Kafka and distributed systems experience matches",
+        "On-call expectation is a potential concern"
+      ],
+      "recommended_keywords": ["distributed systems", "Kafka", "gRPC", "PostgreSQL", "reliability engineering"]
+    },
+    "tailored_resume": {
+      "summary": "Backend engineer with 4 years building distributed Python services at scale. Delivered sub-50ms payment processing pipelines using Kafka and PostgreSQL. Comfortable owning reliability and on-call for production systems.",
+      "skills": ["Python", "Go", "Kafka", "PostgreSQL", "gRPC", "distributed systems", "observability"],
+      "experience": [
+        "Built event-driven payment reconciliation service handling 2M events/day (Kafka + Python)",
+        "Reduced p99 latency by 38% on critical checkout path via query optimisation and caching"
+      ],
+      "education": ["B.Tech Computer Science"]
+    },
+    "cover_letter": {
+      "opening": "Dear Stripe Hiring Team,",
+      "body": "Payments infrastructure that is invisible when it works and catastrophic when it doesn't — that's the engineering challenge I find most motivating. In my current role I own the reliability of a Python-based reconciliation pipeline that processes over two million Kafka events per day, maintaining 99.95% uptime across three regions. I've worked closely with gRPC service meshes and PostgreSQL replication, which maps directly to what your team is building.",
+      "closing": "I'd welcome the chance to discuss how my background fits the Payments Infrastructure team. Thank you for your consideration."
+    }
+  },
+  {
+    "id": 2,
+    "source": "weworkremotely",
+    "company": "Acme Corp",
+    "title": "Full Stack Developer",
+    "location": "Remote",
+    "application_link": "https://weworkremotely.com/jobs/acme-fullstack-99999",
+    "raw_description": "10+ years React and Vue required simultaneously. Must know every AWS service. PhD preferred. Salary: competitive.",
+    "liveness_check": {
+      "status": "expired",
+      "reason": "matched: job (is )?no longer available"
+    },
+    "ai_scoring": null,
+    "note": "Dropped at liveness check — posting was already closed. No AI tokens spent."
+  },
+  {
+    "id": 3,
+    "source": "linkedin",
+    "company": "Vercel",
+    "title": "Developer Advocate — Python",
+    "location": "Remote (Worldwide)",
+    "application_link": "https://vercel.com/careers/developer-advocate-python",
+    "raw_description": "Help Python developers succeed on Vercel. Write tutorials, build demos, speak at conferences. 3+ years Python. Strong communication skills. Experience with Next.js a plus but not required.",
+    "liveness_check": {
+      "status": "active",
+      "reason": "apply control detected"
+    },
+    "ai_scoring": {
+      "role_match": 0.61,
+      "level_fit": 0.90,
+      "growth_potential": 0.85,
+      "remote_alignment": 0.95,
+      "fit_level": "medium",
+      "score": 7,
+      "reasons": [
+        "Python match is strong but role skews toward content creation over engineering",
+        "Level fit is excellent — mid-level role, candidate is well-qualified",
+        "No Next.js background is a minor gap but explicitly listed as optional"
+      ],
+      "recommended_keywords": ["Python", "developer education", "technical writing", "Next.js", "API documentation"]
+    },
+    "tailored_resume": {
+      "summary": "Python engineer with a track record of building developer-facing tools and writing technical documentation. Comfortable presenting at meetups and translating complex backend concepts for mixed-level audiences.",
+      "skills": ["Python", "FastAPI", "technical writing", "REST APIs", "Docker", "developer tooling"],
+      "experience": [
+        "Authored internal onboarding docs adopted by 40+ engineers across 3 teams",
+        "Built open-source CLI tool for local environment setup (200+ GitHub stars)"
+      ],
+      "education": ["B.Tech Computer Science"]
+    },
+    "cover_letter": {
+      "opening": "Dear Vercel Team,",
+      "body": "The best developer advocacy comes from someone who has actually been stuck at 2am debugging a deployment — I've been that person. I've spent the last three years building Python backend services and tooling, and alongside that I've written documentation that my colleagues actually read, which I'm told is rare. I don't have Next.js production experience, but I learn quickly and the Python ecosystem is where I'm most effective.",
+      "closing": "I'd love to talk about how I could help Python developers find their footing on Vercel. Thank you for reading."
+    }
+  }
+]

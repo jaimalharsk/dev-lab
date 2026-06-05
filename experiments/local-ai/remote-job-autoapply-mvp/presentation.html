@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Remote Job Auto-Apply Pipeline — Project Presentation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 11pt;
+    color: #1a1a1a;
+    background: #fff;
+    line-height: 1.5;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 18mm 20mm;
+  }
+
+  @media print {
+    .page { margin: 0; padding: 15mm 18mm; page-break-after: always; }
+    .page:last-child { page-break-after: avoid; }
+  }
+
+  /* PAGE 1 */
+  .title-block { border-left: 4px solid #0f172a; padding-left: 14px; margin-bottom: 24px; }
+  .title-block h1 { font-size: 20pt; font-weight: 700; color: #0f172a; line-height: 1.2; }
+  .title-block .subtitle { font-size: 11pt; color: #475569; margin-top: 4px; }
+  .title-block .meta { font-size: 9.5pt; color: #94a3b8; margin-top: 6px; }
+
+  h2 { font-size: 12pt; font-weight: 700; color: #0f172a; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+  h3 { font-size: 10.5pt; font-weight: 600; color: #1e293b; margin: 10px 0 4px; }
+
+  p { margin-bottom: 8px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+  .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; }
+  .card .label { font-size: 8.5pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-bottom: 4px; }
+  .card .value { font-size: 10.5pt; font-weight: 600; color: #0f172a; }
+  .card p { font-size: 9.5pt; color: #475569; margin: 0; }
+
+  .highlight { background: #0f172a; color: #fff; border-radius: 6px; padding: 10px 14px; margin: 12px 0; }
+  .highlight p { color: #cbd5e1; margin: 0; font-size: 9.5pt; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 8px 0 12px; }
+  th { background: #0f172a; color: #fff; padding: 6px 10px; text-align: left; font-weight: 600; font-size: 9pt; }
+  td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8fafc; }
+
+  .pipeline { display: flex; align-items: center; gap: 0; margin: 10px 0 14px; flex-wrap: wrap; }
+  .step { background: #0f172a; color: #fff; padding: 6px 10px; font-size: 8.5pt; font-weight: 600; border-radius: 4px; white-space: nowrap; }
+  .step.skip { background: #dc2626; }
+  .arrow { color: #94a3b8; font-size: 14pt; margin: 0 4px; }
+
+  .badge { display: inline-block; background: #dbeafe; color: #1d4ed8; font-size: 8pt; font-weight: 600; padding: 2px 7px; border-radius: 10px; margin: 2px 2px 2px 0; }
+  .badge.green { background: #dcfce7; color: #16a34a; }
+  .badge.orange { background: #ffedd5; color: #ea580c; }
+
+  ul { padding-left: 16px; margin-bottom: 8px; }
+  li { margin-bottom: 3px; font-size: 9.5pt; }
+
+  .formula { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 9pt; color: #0f172a; margin: 6px 0 10px; }
+
+  .divider { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+
+  .footer { font-size: 8pt; color: #94a3b8; text-align: center; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ PAGE 1 ═══════════════════════════ -->
+<div class="page">
+
+  <div class="title-block">
+    <h1>Remote Job Auto-Apply Pipeline</h1>
+    <div class="subtitle">A structured-output LLM pipeline for intelligent job discovery and application</div>
+    <div class="meta">Mini-Project · Option 1: Structured-Output Workflow &nbsp;|&nbsp; github.com/jaimalharsk/dev-lab</div>
+  </div>
+
+  <h2>Problem</h2>
+  <p>Job seekers spend hours manually reading postings, tailoring resumes, and writing cover letters — most of which go to listings that are already closed or a poor fit. Unstructured LLM outputs (plain text responses) make automation unreliable: a scorer that returns <em>"looks like a 7 or 8"</em> cannot be used in a pipeline.</p>
+
+  <h2>Solution</h2>
+  <p>A multi-step Python pipeline where <strong>every AI output is a validated Pydantic model</strong>. The pipeline scrapes jobs, checks posting liveness before spending tokens, scores fit across four dimensions, and generates tailored materials — all with schema enforcement at each stage.</p>
+
+  <div class="pipeline">
+    <div class="step">Scrape</div><div class="arrow">→</div>
+    <div class="step">Liveness Check</div><div class="arrow">→</div>
+    <div class="step skip">Drop if expired</div><div class="arrow">→</div>
+    <div class="step">Score (4 dimensions)</div><div class="arrow">→</div>
+    <div class="step">Tailor Resume</div><div class="arrow">→</div>
+    <div class="step">Cover Letter</div><div class="arrow">→</div>
+    <div class="step">Apply + Track</div>
+  </div>
+
+  <h2>Structured Output Schemas</h2>
+  <table>
+    <tr>
+      <th>Pipeline Step</th>
+      <th>Schema</th>
+      <th>Key Validated Fields</th>
+    </tr>
+    <tr>
+      <td><strong>Job Scoring</strong></td>
+      <td><code>JobRelevanceResult</code></td>
+      <td>role_match, level_fit, growth_potential, remote_alignment (each 0–1) → computed score 1–10</td>
+    </tr>
+    <tr>
+      <td><strong>Cover Letter</strong></td>
+      <td><code>CoverLetter</code></td>
+      <td>opening, body, closing (enforces section structure)</td>
+    </tr>
+    <tr>
+      <td><strong>Resume Tailoring</strong></td>
+      <td><code>TailoredResume</code></td>
+      <td>summary, skills[], experience[], education[] (ATS-structured)</td>
+    </tr>
+    <tr>
+      <td><strong>Liveness Check</strong></td>
+      <td><code>LivenessResult</code></td>
+      <td>status: "active" | "expired" | "uncertain", reason</td>
+    </tr>
+  </table>
+
+  <h2>Scoring Model</h2>
+  <p>The LLM returns four sub-scores. The composite is computed deterministically in code — not by the model:</p>
+  <div class="formula">score = round((role_match × 0.45 + level_fit × 0.30 + growth_potential × 0.15 + remote_alignment × 0.10) × 10)</div>
+  <p>If any sub-score is outside [0.0, 1.0], Pydantic raises a <code>ValidationError</code> before the value is used anywhere.</p>
+
+  <hr class="divider">
+
+  <div class="three-col">
+    <div class="card">
+      <div class="label">Validation</div>
+      <div class="value">Hard failure</div>
+      <p>Bad model output raises <code>ValidationError</code>, not a silent wrong result</p>
+    </div>
+    <div class="card">
+      <div class="label">Token efficiency</div>
+      <div class="value">Liveness first</div>
+      <p>Expired postings dropped before any AI calls are made</p>
+    </div>
+    <div class="card">
+      <div class="label">Follow-up tracking</div>
+      <div class="value">7-day cadence</div>
+      <p>Each application stores a follow-up date; overdue items surfaced at pipeline end</p>
+    </div>
+  </div>
+
+  <div class="footer">Remote Job Auto-Apply Pipeline · Option 1: Structured-Output Workflow</div>
+</div>
+
+<!-- ═══════════════════════════ PAGE 2 ═══════════════════════════ -->
+<div class="page">
+
+  <h2>Technical Architecture</h2>
+
+  <div class="two-col">
+    <div>
+      <h3>Tech Stack</h3>
+      <ul>
+        <li><strong>Python 3.11+</strong> — pipeline orchestration</li>
+        <li><strong>OpenAI API</strong> — <code>beta.chat.completions.parse()</code> for structured output</li>
+        <li><strong>Pydantic v2</strong> — schema definition and validation</li>
+        <li><strong>SQLAlchemy + SQLite</strong> — job and application persistence</li>
+        <li><strong>Requests + BeautifulSoup</strong> — scraping and liveness checks</li>
+        <li><strong>Playwright</strong> — form submission automation</li>
+        <li><strong>Streamlit</strong> — local tracking dashboard</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Project Structure</h3>
+      <ul>
+        <li><code>ai/schemas.py</code> — all output models</li>
+        <li><code>ai/scorer.py</code> — multi-dimensional scoring</li>
+        <li><code>ai/resume_tailor.py</code> — structured resume</li>
+        <li><code>ai/cover_letter.py</code> — structured cover letter</li>
+        <li><code>scrapers/liveness.py</code> — posting freshness check</li>
+        <li><code>db.py</code> — Job + Application models</li>
+        <li><code>app.py</code> — pipeline orchestration</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Sample Output — Job Scoring</h2>
+  <p>Input: raw job description text. Output: validated <code>JobRelevanceResult</code> object.</p>
+  <table>
+    <tr><th>Company</th><th>Role</th><th>role_match</th><th>level_fit</th><th>growth</th><th>remote</th><th>Score</th><th>Fit</th></tr>
+    <tr><td>Stripe</td><td>Sr. Backend Engineer</td><td>0.88</td><td>0.82</td><td>0.75</td><td>0.95</td><td><strong>8/10</strong></td><td><span class="badge green">high</span></td></tr>
+    <tr><td>Vercel</td><td>Developer Advocate</td><td>0.61</td><td>0.90</td><td>0.85</td><td>0.95</td><td><strong>7/10</strong></td><td><span class="badge">medium</span></td></tr>
+    <tr><td>Acme Corp</td><td>Full Stack Dev</td><td colspan="5"><em>Dropped at liveness check — posting expired</em></td><td><span class="badge orange">expired</span></td></tr>
+  </table>
+
+  <h2>Key Design Decisions</h2>
+  <table>
+    <tr><th>Decision</th><th>Rationale</th></tr>
+    <tr>
+      <td>Weights in code, not in prompt</td>
+      <td>The LLM scores dimensions; arithmetic is deterministic Python. Weights can be tuned without changing any prompt.</td>
+    </tr>
+    <tr>
+      <td>Liveness check before scoring</td>
+      <td>Pattern matching on HTTP response is free. Scoring via LLM costs tokens. Checking order matters.</td>
+    </tr>
+    <tr>
+      <td><code>@computed_field</code> for composite score</td>
+      <td>The integer score is derived from sub-scores at validation time — it cannot be set to an arbitrary value independently.</td>
+    </tr>
+    <tr>
+      <td>Structured cover letter sections</td>
+      <td>Returning opening/body/closing separately allows post-processing (e.g. swapping closings per company) without re-calling the model.</td>
+    </tr>
+  </table>
+
+  <h2>Safety and Compliance</h2>
+  <ul>
+    <li><code>dry_run=True</code> by default — forms are filled but never submitted without explicit opt-in</li>
+    <li>Daily application cap via <code>MAX_APPLICATIONS_PER_DAY</code> environment variable</li>
+    <li>Scraping uses only public pages and ATS APIs — no session/login scraping</li>
+    <li>All personal data (resume, profile) stays local — sent only to the configured OpenAI endpoint</li>
+  </ul>
+
+  <h2>What This Demonstrates</h2>
+  <div class="highlight">
+    <p>A real multi-step LLM pipeline where <strong>every stage produces validated structured output</strong>. The pipeline fails loudly on bad model responses rather than propagating garbage silently downstream. Schema design, weighted scoring, and output serialization are all first-class concerns — not afterthoughts.</p>
+  </div>
+
+  <h2>Limitations and Next Steps</h2>
+  <div class="two-col">
+    <div>
+      <h3>Current limitations</h3>
+      <ul>
+        <li>Liveness check is pattern-based — does not use a headless browser</li>
+        <li>Scrapers for LinkedIn require rate-limit care</li>
+        <li>Single-threaded — one job scored at a time</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Possible extensions</h3>
+      <ul>
+        <li>Parallel scoring with async OpenAI calls</li>
+        <li>Interview prep (STAR story generation per job)</li>
+        <li>Provider abstraction (Claude / Gemini / local models)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">Remote Job Auto-Apply Pipeline · Option 1: Structured-Output Workflow &nbsp;|&nbsp; github.com/jaimalharsk/dev-lab</div>
+</div>
+
+</body>
+</html>
