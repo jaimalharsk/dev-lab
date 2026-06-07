@@ -39,15 +39,14 @@ Upload it inside `📁 Project Files/` in Google Drive.
 Follow `DEMO_SCRIPT.md` for the exact script and timing.
 
 **Before recording checklist:**
-- [ ] Terminal font size 16pt or larger
+- [ ] Terminal font size 16pt or larger, full-screen terminal window
+- [ ] `python tui.py --demo` tested once at full speed (~35–40s runtime)
 - [ ] `ai/schemas.py` open in editor
-- [ ] `scrapers/liveness.py` open in editor
 - [ ] `app.py` open in editor, scrolled to `apply_pipeline`
-- [ ] `data/sample_jobs.json` open in editor
 - [ ] `presentation.html` open in browser (zoomed to 110%)
 - [ ] GitHub repo open in a browser tab
 - [ ] Microphone tested
-- [ ] Do one dry run to check timing
+- [ ] One full dry run with narration to confirm total timing fits in 3 minutes
 
 Upload the recorded video as `demo_video.mp4` to the Drive folder root.
 

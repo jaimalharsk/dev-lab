@@ -90,6 +90,7 @@ remote-job-autoapply-mvp/
 - `pydantic` — schema validation for all AI outputs
 - `playwright` — browser automation for form submission
 - `streamlit` + `pandas` — local tracking dashboard
+- `rich` — terminal dashboard (`tui.py`)
 - `python-dotenv` — local config
 
 ## Run locally
@@ -128,7 +129,25 @@ The pipeline will:
 6. Record applications with a follow-up date (7 days out)
 7. Print any follow-ups that are due
 
-### Step 4 — View dashboard
+### Step 4 — Terminal dashboard (`tui.py`)
+
+A `rich`-based full-screen terminal UI that visualizes the pipeline as it runs — built for live demos and screen recordings.
+
+```bash
+python tui.py --demo   # replays data/sample_jobs.json with timed reveals — no API key needed
+python tui.py          # shows live state from the SQLite database (run app.py first)
+```
+
+`--demo` mode walks through each sample job stage by stage:
+
+1. **Liveness check** — shows the `LivenessResult` and, for expired postings, confirms the scorer was never called
+2. **Scoring** — renders each `JobRelevanceResult` sub-score as a live bar (`role_match`, `level_fit`, `growth_potential`, `remote_alignment`) plus the computed composite score and reasons
+3. **Material generation** — for jobs above threshold, shows the `TailoredResume.summary` and `CoverLetter` excerpt
+4. **Running totals** — a footer tracks scanned / dropped-at-liveness / scored / materials-generated counts live
+
+Every value rendered is parsed through the same Pydantic models the pipeline uses (`JobRelevanceResult`, `LivenessResult`, `CoverLetter`, `TailoredResume`) — the dashboard is itself a consumer of the structured output, not a separate presentation layer.
+
+### Step 5 — Streamlit dashboard
 
 ```bash
 streamlit run dashboard.py
