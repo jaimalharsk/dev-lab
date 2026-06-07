@@ -69,7 +69,7 @@ Let it finish on the green "Pipeline complete" panel.
 ## Before you record — checklist
 
 - [ ] Terminal font size 16pt or larger, full-screen terminal window
-- [ ] `python tui.py --demo` tested once at full speed (total runtime ≈ 35–40s)
+- [ ] `python tui.py --demo` tested once at full speed (total runtime ≈ 30–32s)
 - [ ] `ai/schemas.py` open in editor
 - [ ] `app.py` open in editor, scrolled to `apply_pipeline`
 - [ ] `presentation.html` open in browser (page 1 visible, zoomed to 110%)

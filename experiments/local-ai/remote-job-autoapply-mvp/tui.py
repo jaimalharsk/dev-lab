@@ -30,7 +30,7 @@ console = Console()
 
 FIT_STYLE = {"high": "bold green", "medium": "bold yellow", "low": "bold red"}
 LIVENESS_STYLE = {"active": "green", "expired": "red", "uncertain": "yellow"}
-STEP_DELAY = 1.2
+STEP_DELAY = 1.7
 
 
 def load_demo_dataset() -> list[dict]:
@@ -224,7 +224,7 @@ def run_demo() -> None:
                 border_style="green",
             )
         )
-        time.sleep(3)
+        time.sleep(3.5)
 
 
 def run_live() -> None:
