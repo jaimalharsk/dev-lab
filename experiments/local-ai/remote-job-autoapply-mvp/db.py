@@ -20,6 +20,9 @@ class Job(Base):
     application_link: Mapped[str] = mapped_column(String(600), unique=True)
     date_found: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     relevance_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    min_salary: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    max_salary: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    salary_currency: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
 
 class Application(Base):
@@ -32,6 +35,7 @@ class Application(Base):
     tailored_resume_path: Mapped[str | None] = mapped_column(String(400), nullable=True)
     cover_letter_path: Mapped[str | None] = mapped_column(String(400), nullable=True)
     follow_up_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    outcome: Mapped[str] = mapped_column(String(50), default="pending")
 
 
 def init_db() -> None:

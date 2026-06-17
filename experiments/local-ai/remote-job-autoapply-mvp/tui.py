@@ -23,8 +23,8 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from ai.schemas import CoverLetter, JobRelevanceResult, LivenessResult, TailoredResume
-from config import MIN_RELEVANCE_SCORE
+from ai.schemas import CoverLetter, JobRelevanceResult, LivenessResult, SalaryRange, TailoredResume
+from config import MIN_RELEVANCE_SCORE, MIN_SALARY
 
 console = Console()
 
@@ -65,19 +65,27 @@ def build_table(jobs: list[dict], current: int) -> Table:
     table.add_column("Company", style="bold cyan", no_wrap=True)
     table.add_column("Role")
     table.add_column("Liveness", justify="center")
+    table.add_column("Salary", justify="right")
     table.add_column("Score", justify="center")
     table.add_column("Fit", justify="center")
     table.add_column("Outcome")
 
     for i, job in enumerate(jobs):
         if i > current:
-            table.add_row(job["company"], job["title"], "[dim]…[/dim]", "[dim]—[/dim]", "[dim]—[/dim]", "[dim]queued[/dim]")
+            table.add_row(job["company"], job["title"], "[dim]…[/dim]", "[dim]—[/dim]", "[dim]—[/dim]", "[dim]—[/dim]", "[dim]queued[/dim]")
             continue
 
         liveness = job.get("liveness_check")
         scoring = job.get("ai_scoring")
+        salary_data = job.get("salary_range")
 
         liveness_cell = f"[{LIVENESS_STYLE.get(liveness['status'], 'white')}]{liveness['status']}[/]" if liveness else "—"
+
+        salary_cell = "—"
+        if salary_data and liveness and liveness.get("status") != "expired":
+            sal = SalaryRange.model_validate(salary_data)
+            salary_cell = f"[dim]{sal.display()}[/dim]"
+
         score_cell = f"{scoring['score']}/10" if scoring else "—"
         fit_cell = f"[{FIT_STYLE.get(scoring['fit_level'], 'white')}]{scoring['fit_level']}[/]" if scoring else "—"
 
@@ -92,7 +100,7 @@ def build_table(jobs: list[dict], current: int) -> Table:
         else:
             outcome = ""
 
-        table.add_row(job["company"], job["title"], liveness_cell, score_cell, fit_cell, outcome)
+        table.add_row(job["company"], job["title"], liveness_cell, salary_cell, score_cell, fit_cell, outcome)
 
     return table
 
@@ -110,6 +118,18 @@ def build_detail(job: dict, stage: str) -> Panel:
         items.append(Text(""))
         items.append(Text("→ LivenessResult validated. Job removed from DB.", style="italic"))
         items.append(Text("  Scorer was never called — zero tokens spent on a dead listing.", style="italic dim"))
+
+    elif stage == "salary":
+        salary = SalaryRange.model_validate(job["salary_range"])
+        items.append(Text("SalaryRange", style="bold"))
+        items.append(Text(f"  is_disclosed:  {salary.is_disclosed}", style="dim"))
+        items.append(Text(f"  range:         {salary.display()}", style="bold green" if salary.is_disclosed else "yellow"))
+        items.append(Text(f"  currency:      {salary.currency}   period: {salary.period}", style="dim"))
+        items.append(Text(""))
+        floor_note = f"≥ ${MIN_SALARY:,}/yr  ✓" if MIN_SALARY > 0 else "no floor configured"
+        items.append(Text(f"  floor check:   {floor_note}", style="dim"))
+        items.append(Text(""))
+        items.append(Text("→ SalaryRange validated. Proceeding to score.", style="italic"))
 
     elif stage == "scoring":
         liveness = LivenessResult.model_validate(job["liveness_check"])
@@ -194,6 +214,9 @@ def run_demo() -> None:
                 time.sleep(STEP_DELAY)
                 continue
 
+            layout["detail"].update(build_detail(job, "salary"))
+            time.sleep(STEP_DELAY)
+
             layout["detail"].update(build_detail(job, "scoring"))
             time.sleep(STEP_DELAY)
 
@@ -240,18 +263,37 @@ def run_live() -> None:
     table = Table(title="Live Pipeline State", expand=True, border_style="grey50")
     table.add_column("Company", style="bold cyan")
     table.add_column("Role")
+    table.add_column("Salary", justify="right")
     table.add_column("Score", justify="center")
     table.add_column("Applied", justify="center")
     table.add_column("Follow-up due", justify="center")
+    table.add_column("Outcome", justify="center")
+
+    OUTCOME_STYLE = {
+        "pending": "dim",
+        "no_response": "yellow",
+        "interview": "bold cyan",
+        "rejected": "red",
+        "offer": "bold green",
+    }
 
     for job in jobs:
         application = session.query(Application).filter_by(job_id=job.id).first()
+        salary_cell = "—"
+        if job.min_salary:
+            sym = "$" if job.salary_currency in (None, "USD") else job.salary_currency
+            hi = f"–{sym}{job.max_salary:,}" if job.max_salary else "+"
+            salary_cell = f"{sym}{job.min_salary:,}{hi}"
         score_cell = f"{job.relevance_score}/10" if job.relevance_score is not None else "—"
         applied_cell = "[green]✓[/green]" if application else "[dim]—[/dim]"
         follow_up_cell = "—"
-        if application and application.follow_up_date:
-            follow_up_cell = application.follow_up_date.strftime("%Y-%m-%d")
-        table.add_row(job.company, job.title, score_cell, applied_cell, follow_up_cell)
+        outcome_cell = "—"
+        if application:
+            if application.follow_up_date:
+                follow_up_cell = application.follow_up_date.strftime("%Y-%m-%d")
+            style = OUTCOME_STYLE.get(application.outcome, "white")
+            outcome_cell = f"[{style}]{application.outcome}[/]"
+        table.add_row(job.company, job.title, salary_cell, score_cell, applied_cell, follow_up_cell, outcome_cell)
 
     console.print(table)
     session.close()

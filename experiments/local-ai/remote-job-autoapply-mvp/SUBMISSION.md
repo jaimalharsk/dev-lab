@@ -40,7 +40,7 @@ Follow `DEMO_SCRIPT.md` for the exact script and timing.
 
 **Before recording checklist:**
 - [ ] Terminal font size 16pt or larger, full-screen terminal window
-- [ ] `python tui.py --demo` tested once at full speed (~30–32s runtime)
+- [ ] `python tui.py --demo` tested once at full speed (~34–36s runtime)
 - [ ] `ai/schemas.py` open in editor
 - [ ] `app.py` open in editor, scrolled to `apply_pipeline`
 - [ ] `presentation.html` open in browser (zoomed to 110%)

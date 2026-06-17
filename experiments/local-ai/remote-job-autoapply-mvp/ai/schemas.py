@@ -2,6 +2,22 @@ from typing import Literal
 from pydantic import BaseModel, Field, computed_field
 
 
+class SalaryRange(BaseModel):
+    is_disclosed: bool
+    min_salary: int | None = None
+    max_salary: int | None = None
+    currency: str = "USD"
+    period: Literal["annual", "monthly", "hourly"] = "annual"
+
+    def display(self) -> str:
+        if not self.is_disclosed or self.min_salary is None:
+            return "not disclosed"
+        sym = {"USD": "$", "GBP": "£", "EUR": "€"}.get(self.currency, self.currency)
+        suffix = {"annual": "/yr", "monthly": "/mo", "hourly": "/hr"}[self.period]
+        hi = f"–{sym}{self.max_salary:,}" if self.max_salary else "+"
+        return f"{sym}{self.min_salary:,}{hi}{suffix}"
+
+
 class JobRelevanceResult(BaseModel):
     role_match: float = Field(..., ge=0.0, le=1.0)
     level_fit: float = Field(..., ge=0.0, le=1.0)

@@ -6,10 +6,17 @@
     "title": "Senior Backend Engineer — Payments Infrastructure",
     "location": "Remote (US/EU)",
     "application_link": "https://stripe.com/jobs/listing/senior-backend-engineer/12345",
-    "raw_description": "We're looking for a Senior Backend Engineer to join our Payments Infrastructure team. You'll design and build distributed systems that process billions of transactions. 5+ years Python or Go required. Experience with Kafka, gRPC, and PostgreSQL strongly preferred. You'll own reliability, latency, and on-call rotations for critical payment paths.",
+    "raw_description": "We're looking for a Senior Backend Engineer to join our Payments Infrastructure team. You'll design and build distributed systems that process billions of transactions. 5+ years Python or Go required. Experience with Kafka, gRPC, and PostgreSQL strongly preferred. You'll own reliability, latency, and on-call rotations for critical payment paths. Salary: $180,000–$240,000/year.",
     "liveness_check": {
       "status": "active",
       "reason": "apply control detected"
+    },
+    "salary_range": {
+      "is_disclosed": true,
+      "min_salary": 180000,
+      "max_salary": 240000,
+      "currency": "USD",
+      "period": "annual"
     },
     "ai_scoring": {
       "role_match": 0.88,
@@ -52,6 +59,13 @@
       "status": "expired",
       "reason": "matched: job (is )?no longer available"
     },
+    "salary_range": {
+      "is_disclosed": false,
+      "min_salary": null,
+      "max_salary": null,
+      "currency": "USD",
+      "period": "annual"
+    },
     "ai_scoring": null,
     "note": "Dropped at liveness check — posting was already closed. No AI tokens spent."
   },
@@ -62,10 +76,17 @@
     "title": "Developer Advocate — Python",
     "location": "Remote (Worldwide)",
     "application_link": "https://vercel.com/careers/developer-advocate-python",
-    "raw_description": "Help Python developers succeed on Vercel. Write tutorials, build demos, speak at conferences. 3+ years Python. Strong communication skills. Experience with Next.js a plus but not required.",
+    "raw_description": "Help Python developers succeed on Vercel. Write tutorials, build demos, speak at conferences. 3+ years Python. Strong communication skills. Experience with Next.js a plus but not required. Compensation: $130,000–$170,000 per year.",
     "liveness_check": {
       "status": "active",
       "reason": "apply control detected"
+    },
+    "salary_range": {
+      "is_disclosed": true,
+      "min_salary": 130000,
+      "max_salary": 170000,
+      "currency": "USD",
+      "period": "annual"
     },
     "ai_scoring": {
       "role_match": 0.61,

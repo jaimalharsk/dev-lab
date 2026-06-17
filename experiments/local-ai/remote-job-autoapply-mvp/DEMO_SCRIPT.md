@@ -34,13 +34,13 @@
 python tui.py --demo
 ```
 
-Narrate as it plays — the dashboard does the pacing for you (~1.2s per reveal):
+Narrate as it plays — the dashboard does the pacing for you (~1.7s per reveal):
 
-- **Job 1 (Stripe)** — *"First, a liveness check — before we spend a single token, we confirm the posting is actually live. This one's active. Now it scores across four dimensions — role match, level fit, growth potential, remote alignment — each rendered as its own bar. Composite: 8 out of 10, high fit. Because it clears the threshold, the pipeline generates a tailored resume summary and a structured cover letter — opening, body, closing as separate fields, not a wall of text."*
+- **Job 1 (Stripe)** — *"First, a liveness check — before we spend a single token, we confirm the posting is actually live. This one's active. Next, salary extraction: `SalaryRange` comes back with $180k–$240k/yr, disclosed, clears the floor. Now it scores across four dimensions — role match, level fit, growth potential, remote alignment — each rendered as its own bar. Composite: 8 out of 10, high fit. Because it clears the threshold, the pipeline generates a tailored resume summary and a structured cover letter — opening, body, closing as separate fields, not a wall of text."*
 
 - **Job 2 (Acme Corp)** — *"Watch this one — the liveness check catches a closed posting immediately. `LivenessResult` comes back `expired`, the job is deleted from the database, and the scorer is never even called. Zero tokens wasted on a dead listing."*
 
-- **Job 3 (Vercel)** — *"Score of 7, medium fit — role match is lower because it's an advocacy role rather than pure engineering, but level fit and growth potential are both strong. Still clears the threshold, so materials get generated."*
+- **Job 3 (Vercel)** — *"Score of 7, medium fit — role match is lower because it's an advocacy role rather than pure engineering, but level fit and growth potential are both strong. Salary is $130k–$170k, clears the floor. Still clears the threshold, so materials get generated."*
 
 - **Footer** — *"This running counter — scanned, dropped at liveness, scored, materials generated — updates live as each job clears the pipeline."*
 
@@ -69,7 +69,7 @@ Let it finish on the green "Pipeline complete" panel.
 ## Before you record — checklist
 
 - [ ] Terminal font size 16pt or larger, full-screen terminal window
-- [ ] `python tui.py --demo` tested once at full speed (total runtime ≈ 30–32s)
+- [ ] `python tui.py --demo` tested once at full speed (total runtime ≈ 34–36s)
 - [ ] `ai/schemas.py` open in editor
 - [ ] `app.py` open in editor, scrolled to `apply_pipeline`
 - [ ] `presentation.html` open in browser (page 1 visible, zoomed to 110%)

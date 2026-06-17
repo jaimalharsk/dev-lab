@@ -5,6 +5,7 @@ from config import (
     CANDIDATE_PROFILE_PATH,
     MASTER_RESUME_PATH,
     MIN_RELEVANCE_SCORE,
+    MIN_SALARY,
     MAX_APPLICATIONS_PER_DAY,
 )
 from db import init_db, get_session, Job, Application
@@ -13,6 +14,7 @@ from scrapers.weworkremotely import fetch_weworkremotely_jobs
 from scrapers.linkedin import fetch_linkedin_jobs
 from scrapers.company_pages import fetch_company_careers_jobs
 from scrapers.liveness import check_liveness
+from ai.salary_extractor import extract_salary
 from ai.scorer import score_job_relevance
 from ai.resume_tailor import tailor_resume
 from ai.cover_letter import generate_cover_letter
@@ -76,6 +78,14 @@ def apply_pipeline(dry_run: bool = True) -> None:
             session.commit()
             continue
 
+        salary = extract_salary(job.description)
+        job.min_salary = salary.min_salary
+        job.max_salary = salary.max_salary
+        job.salary_currency = salary.currency
+        if MIN_SALARY > 0 and salary.is_disclosed and salary.min_salary is not None and salary.min_salary < MIN_SALARY:
+            print(f"  [skip] {job.company} — {job.title}: salary {salary.display()} below floor ${MIN_SALARY:,}/yr")
+            continue
+
         result = score_job_relevance(profile, job.description)
         job.relevance_score = result.score
         print(
@@ -115,6 +125,7 @@ def apply_pipeline(dry_run: bool = True) -> None:
             Application(
                 job_id=job.id,
                 status="applied",
+                outcome="pending",
                 tailored_resume_path=str(resume_path),
                 cover_letter_path=str(cover_path),
                 follow_up_date=datetime.utcnow() + timedelta(days=FOLLOW_UP_DAYS),
@@ -131,7 +142,7 @@ def print_pending_follow_ups() -> None:
         session.query(Application, Job)
         .join(Job, Application.job_id == Job.id)
         .filter(Application.follow_up_date <= datetime.utcnow())
-        .filter(Application.status == "applied")
+        .filter(Application.outcome == "pending")
         .all()
     )
     if due:
@@ -141,9 +152,25 @@ def print_pending_follow_ups() -> None:
     session.close()
 
 
+def print_outcomes_summary() -> None:
+    from sqlalchemy import func
+    session = get_session()
+    rows = (
+        session.query(Application.outcome, func.count())
+        .group_by(Application.outcome)
+        .all()
+    )
+    if rows:
+        print("\nOutcome summary:")
+        for outcome, count in rows:
+            print(f"  {outcome}: {count}")
+    session.close()
+
+
 if __name__ == "__main__":
     init_db()
     upsert_jobs()
     apply_pipeline(dry_run=True)
     print_pending_follow_ups()
+    print_outcomes_summary()
     print("\nPipeline completed. Set dry_run=False after validating selectors and platform compliance.")

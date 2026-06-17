@@ -37,10 +37,11 @@ Every AI step returns a validated Pydantic model. Malformed or incomplete model 
 
 | Step | Schema | Validated fields |
 |------|--------|-----------------|
+| Liveness check | `LivenessResult` | `status` (active / expired / uncertain), `reason` |
+| Salary extraction | `SalaryRange` | `is_disclosed`, `min_salary`, `max_salary`, `currency`, `period` |
 | Job scoring | `JobRelevanceResult` | `role_match`, `level_fit`, `growth_potential`, `remote_alignment` (each 0–1), computed `score` (1–10) |
 | Cover letter | `CoverLetter` | `opening`, `body`, `closing` |
 | Resume tailoring | `TailoredResume` | `summary`, `skills[]`, `experience[]`, `education[]` |
-| Liveness check | `LivenessResult` | `status` (active / expired / uncertain), `reason` |
 
 ### Scoring breakdown
 
@@ -68,8 +69,9 @@ remote-job-autoapply-mvp/
 │   └── master_resume.txt
 ├── ai/
 │   ├── client.py
-│   ├── schemas.py      # all structured output models
-│   ├── scorer.py       # multi-dimensional relevance scoring
+│   ├── schemas.py          # all structured output models
+│   ├── salary_extractor.py # SalaryRange extraction + floor gate
+│   ├── scorer.py           # multi-dimensional relevance scoring
 │   ├── resume_tailor.py
 │   └── cover_letter.py
 ├── scrapers/
@@ -123,11 +125,12 @@ The pipeline will:
 
 1. Scrape jobs from configured sources
 2. Check each posting for liveness — expired listings are dropped before any AI calls
-3. Score live jobs across four dimensions; print sub-scores to stdout
-4. Generate tailored resume + cover letter for jobs above the threshold
-5. Attempt dry-run form submission
-6. Record applications with a follow-up date (7 days out)
-7. Print any follow-ups that are due
+3. Extract salary as a `SalaryRange` structured output; skip if below `MIN_SALARY` floor
+4. Score live jobs across four dimensions; print sub-scores to stdout
+5. Generate tailored resume + cover letter for jobs above the threshold
+6. Attempt dry-run form submission
+7. Record applications with a follow-up date (7 days out) and `outcome=pending`
+8. Print follow-ups due and an outcomes summary (pending / interview / rejected / offer)
 
 ### Step 4 — Terminal dashboard (`tui.py`)
 
